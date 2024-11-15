@@ -8,7 +8,6 @@ This project is a simple Flask-based API that allows users to upload files to a 
 
 ## Prerequisites
 - Python 3.x
-- Flask (`pip install Flask`)
 
 ## Getting Started
 
