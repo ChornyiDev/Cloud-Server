@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/Users/ChornyiDev/Documents/GitHub/Cloud Server/.venv/bin/python" "$0" "$@"
-' '''
+#!/Users/ChornyiDev/Documents/GitHub/Cloud-Server/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
