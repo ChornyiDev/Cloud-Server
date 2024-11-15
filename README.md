@@ -64,6 +64,7 @@ To run the Flask app as a system service, follow these steps:
    WorkingDirectory=/path/to/Cloud-Server
    Environment="PATH=/path/to/Cloud-Server/venv/bin"
    ExecStart=/path/to/Cloud-Server/venv/bin/python app.py
+   EnvironmentFile=/path/to/Cloud-Server/.env
 
    [Install]
    WantedBy=multi-user.target
