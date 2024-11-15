@@ -1,4 +1,4 @@
- # Flask File Upload and Download API
+# Flask File Upload and Download API
 
 This project is a simple Flask-based API that allows users to upload files to a server and download them using generated unique URLs. It features endpoint routes for file upload and file download, and generates unique filenames to avoid collisions.
 
@@ -8,6 +8,7 @@ This project is a simple Flask-based API that allows users to upload files to a 
 
 ## Prerequisites
 - Python 3.x
+- Flask (`pip install Flask`)
 
 ## Getting Started
 
@@ -28,12 +29,20 @@ This project is a simple Flask-based API that allows users to upload files to a 
    source venv/bin/activate
    ```
 
-5. **Install dependencies**:
+4. **Install dependencies**:
    ```sh
    pip install -r requirements.txt
    ```
 
 ### Running the App
+
+To run the Flask application locally:
+1. Make sure you're in the project directory.
+2. Run the Flask application:
+   ```sh
+   python app.py
+   ```
+3. The server will start on `http://127.0.0.1:5000` by default.
 
 ### Running as a System Service
 
@@ -41,7 +50,7 @@ To run the Flask app as a system service, follow these steps:
 
 1. **Create a service file**: Create a new service file for your Flask application.
    ```sh
-   sudo nano /etc/systemd/system/flaskapp.service
+   sudo nano /etc/systemd/system/file_server.service
    ```
 
    Add the following content to the file:
@@ -69,20 +78,13 @@ To run the Flask app as a system service, follow these steps:
 
 3. **Start the service**:
    ```sh
-   sudo systemctl start flaskapp
+   sudo systemctl start file_server
    ```
 
 4. **Enable the service** to start on boot:
    ```sh
-   sudo systemctl enable flaskapp
+   sudo systemctl enable file_server
    ```
-
-1. Make sure you're in the project directory.
-2. Run the Flask application:
-   ```sh
-   python app.py
-   ```
-3. The server will start on `http://127.0.0.1:5000` by default.
 
 ### API Endpoints
 
