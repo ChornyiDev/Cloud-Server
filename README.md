@@ -42,7 +42,7 @@ To run the Flask application locally:
    ```sh
    python file_server.py
    ```
-3. The server will start on `http://127.0.0.1:5000` by default.
+3. The server will start on `http://localhost:5000` by default.
 
 ### Running as a System Service
 
