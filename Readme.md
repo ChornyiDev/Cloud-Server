@@ -9,6 +9,7 @@ This project is a simple Flask-based API that allows users to upload files to a 
 ## Prerequisites
 - Python 3.x
 - Flask (`pip install Flask`)
+- Gunicorn (`pip install gunicorn`)
 
 ## Getting Started
 
@@ -36,6 +37,7 @@ This project is a simple Flask-based API that allows users to upload files to a 
 
 ### Running the App
 
+#### Development Mode
 To run the Flask application locally:
 1. Make sure you're in the project directory.
 2. Run the Flask application:
@@ -44,11 +46,20 @@ To run the Flask application locally:
    ```
 3. The server will start on `http://localhost:5000` by default.
 
+#### Production Mode
+To run the application in production mode using Gunicorn:
+1. Make sure you're in the project directory and your virtual environment is activated.
+2. Run the application with Gunicorn:
+   ```sh
+   gunicorn -b 0.0.0.0:5000 file_server:app
+   ```
+3. The server will be accessible from any IP address on port 5000.
+
 ### Running as a System Service
 
 To run the Flask app as a system service, follow these steps:
 
-1. **Create a service file**: Create a new service file for your Flask application.
+1. **Create a service file**:
    ```sh
    sudo nano /etc/systemd/system/file_server.service
    ```
@@ -63,7 +74,7 @@ To run the Flask app as a system service, follow these steps:
    User=<your-username>
    WorkingDirectory=/path/to/Cloud-Server
    Environment="PATH=/path/to/Cloud-Server/venv/bin"
-   ExecStart=/path/to/Cloud-Server/venv/bin/python file_server.py
+   ExecStart=/path/to/Cloud-Server/venv/bin/gunicorn -b 0.0.0.0:5000 file_server:app
 
    [Install]
    WantedBy=multi-user.target
@@ -137,3 +148,21 @@ To run the Flask app as a system service, follow these steps:
 ### Error Handling
 - If the `file` key is not present in the request, the server will respond with `400 Bad Request` and an error message.
 - If a requested file does not exist, the server will respond with `404 Not Found`.
+
+### Security Considerations
+When running the server with public access, consider implementing:
+- SSL/TLS encryption (HTTPS)
+- Authentication system
+- Rate limiting
+- File size restrictions
+- Allowed file types validation
+
+### Accessing the Server
+- Local access: `http://localhost:5000`
+- Public access: `http://<your-server-ip>:5000`
+- If using a domain: `http://<your-domain>:5000`
+
+### Troubleshooting
+- Make sure port 5000 is open in your firewall
+- Check server logs using: `sudo journalctl -u file_server`
+- Verify the service status: `sudo systemctl status file_server`
