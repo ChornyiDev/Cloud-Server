@@ -1,7 +1,12 @@
 from flask import Flask, request, send_file, jsonify, url_for
+from dotenv import load_dotenv
 import os
 from datetime import datetime
 import uuid
+
+# Load environment variables
+load_dotenv()
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
 
 app = Flask(__name__)
 
@@ -35,8 +40,8 @@ def upload_file():
     file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
     file.save(file_path)
     
-    # Generate download URL
-    download_url = request.host_url.rstrip('/') + url_for('download_file', filename=unique_filename)
+    # Use BASE_URL instead of request.host_url
+    download_url = f"{BASE_URL.rstrip('/')}{url_for('download_file', filename=unique_filename)}"
     
     return jsonify({
         'message': 'File uploaded successfully',
