@@ -31,7 +31,7 @@ This project is a simple Flask-based API that allows users to upload files to a 
 
 5. **Install dependencies**:
    ```sh
-   pip install Flask
+   pip install -r requirements.txt
    ```
 
 ### Running the App
