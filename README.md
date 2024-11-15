@@ -40,7 +40,7 @@ To run the Flask application locally:
 1. Make sure you're in the project directory.
 2. Run the Flask application:
    ```sh
-   python app.py
+   python file_server.py
    ```
 3. The server will start on `http://127.0.0.1:5000` by default.
 
@@ -63,8 +63,7 @@ To run the Flask app as a system service, follow these steps:
    User=<your-username>
    WorkingDirectory=/path/to/Cloud-Server
    Environment="PATH=/path/to/Cloud-Server/venv/bin"
-   ExecStart=/path/to/Cloud-Server/venv/bin/python app.py
-   EnvironmentFile=/path/to/Cloud-Server/.env
+   ExecStart=/path/to/Cloud-Server/venv/bin/python file_server.py
 
    [Install]
    WantedBy=multi-user.target
