@@ -97,7 +97,7 @@ To run the Flask app as a system service, follow these steps:
 
   **Example Request** (using `curl`):
   ```sh
-  curl -F "file=@yourfile.txt" http://127.0.0.1:5000/upload
+  curl -F "file=@yourfile.txt" http://localhost:5000/upload
   ```
 
   **Example Response**:
@@ -106,7 +106,7 @@ To run the Flask app as a system service, follow these steps:
     "message": "File uploaded successfully",
     "original_filename": "yourfile.txt",
     "stored_filename": "yourfile_20231115_123456_abc12345.txt",
-    "download_url": "http://127.0.0.1:5000/download/yourfile_20231115_123456_abc12345.txt"
+    "download_url": "http://localhost:5000/download/yourfile_20231115_123456_abc12345.txt"
   }
   ```
 
@@ -118,7 +118,7 @@ To run the Flask app as a system service, follow these steps:
 
   **Example Request** (using `curl`):
   ```sh
-  curl -O http://127.0.0.1:5000/download/yourfile_20231115_123456_abc12345.txt
+  curl -O http://localhost:5000/download/yourfile_20231115_123456_abc12345.txt
   ```
 
 ### Directory Structure
