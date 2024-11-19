@@ -6,11 +6,6 @@ This project is a simple Flask-based API that allows users to upload files to a 
 - **File Upload**: Upload files to the server, which are saved with a unique filename to avoid collisions.
 - **File Download**: Download uploaded files using a generated download URL.
 
-## Prerequisites
-- Python 3.x
-- Flask (`pip install Flask`)
-- Gunicorn (`pip install gunicorn`)
-
 ## Getting Started
 
 ### Installation
@@ -104,20 +99,21 @@ To run the Flask app as a system service, follow these steps:
 - **Method**: `POST`
 - **Description**: Uploads a file to the server, and saves it with a unique filename.
 - **Request Body**: The request should include a file under the `file` key (using `multipart/form-data`).
-- **Response**: A JSON object containing the original filename, stored filename, and a URL to download the file.
+- **Response**: A JSON object containing the original filename, stored filename, download URL, and preview URL.
 
   **Example Request** (using `curl`):
   ```sh
-  curl -F "file=@yourfile.txt" http://localhost:5000/upload
+  curl -F "file=@yourvideo.mp4" http://localhost:5000/upload
   ```
 
   **Example Response**:
   ```json
   {
     "message": "File uploaded successfully",
-    "original_filename": "yourfile.txt",
-    "stored_filename": "yourfile_20231115_123456_abc12345.txt",
-    "download_url": "http://localhost:5000/download/yourfile_20231115_123456_abc12345.txt"
+    "original_filename": "yourvideo.mp4",
+    "stored_filename": "yourvideo_20240220_123456_abc12345.mp4",
+    "download_url": "http://localhost:5000/download/yourvideo_20240220_123456_abc12345.mp4",
+    "preview_url": "http://localhost:5000/preview/yourvideo_20240220_123456_abc12345.mp4"
   }
   ```
 
@@ -129,8 +125,37 @@ To run the Flask app as a system service, follow these steps:
 
   **Example Request** (using `curl`):
   ```sh
-  curl -O http://127.0.0.1:5000/download/yourfile_20231115_123456_abc12345.txt
+  curl -O http://127.0.0.1:5000/download/yourvideo_20240220_123456_abc12345.mp4
   ```
+
+#### 3. Preview File
+- **URL**: `/preview/<filename>`
+- **Method**: `GET`
+- **Description**: Streams video or audio content for preview in browser.
+- **Supported Types**: Video and audio files
+- **Response**: 
+  - Success: Streams the media content
+  - Error: 400 if file type is not supported for preview
+  - Error: 404 if file not found
+
+  **Example Usage**:
+  ```html
+  <!-- In HTML -->
+  <video src="http://localhost:5000/preview/yourvideo_20240220_123456_abc12345.mp4" controls></video>
+  <audio src="http://localhost:5000/preview/youraudio_20240220_123456_abc12345.mp3" controls></audio>
+  ```
+
+### Prerequisites
+- Python 3.x
+- Flask
+- python-dotenv
+- gunicorn
+- python-magic (for MIME type detection)
+
+For Ubuntu/Debian systems, also install:
+```bash
+sudo apt-get install libmagic1
+```
 
 ### Directory Structure
 ```
@@ -160,9 +185,15 @@ When running the server with public access, consider implementing:
 ### Accessing the Server
 - Local access: `http://localhost:5000`
 - Public access: `http://<your-server-ip>:5000`
-- If using a domain: `http://<your-domain>:5000`
 
 ### Troubleshooting
 - Make sure port 5000 is open in your firewall
 - Check server logs using: `sudo journalctl -u file_server`
 - Verify the service status: `sudo systemctl status file_server`
+
+### Supported Preview Formats
+The preview functionality supports:
+- Video formats (mp4, webm, etc.)
+- Audio formats (mp3, wav, etc.)
+
+Note: Other file types will return a 400 error when attempting to preview.
