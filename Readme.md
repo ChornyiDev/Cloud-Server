@@ -97,13 +97,19 @@ To run the Flask app as a system service, follow these steps:
 #### 1. Upload File
 - **URL**: `/upload`
 - **Method**: `POST`
-- **Description**: Uploads a file to the server, and saves it with a unique filename.
-- **Request Body**: The request should include a file under the `file` key (using `multipart/form-data`).
+- **Description**: Uploads a file to the server either from local file or URL.
+- **Request Body**: 
+  - Option 1: Local file upload using `file` key (multipart/form-data)
+  - Option 2: Remote file upload using `file_url` key (form data)
 - **Response**: A JSON object containing the original filename, stored filename, download URL, and preview URL.
 
-  **Example Request** (using `curl`):
+  **Example Requests** (using `curl`):
   ```sh
+  # Local file upload
   curl -F "file=@yourvideo.mp4" http://localhost:5000/upload
+
+  # URL file upload
+  curl -F "file_url=https://example.com/video.mp4" http://localhost:5000/upload
   ```
 
   **Example Response**:
@@ -151,10 +157,16 @@ To run the Flask app as a system service, follow these steps:
 - python-dotenv
 - gunicorn
 - python-magic (for MIME type detection)
+- requests (for URL file downloads)
 
-For Ubuntu/Debian systems, also install:
+For Ubuntu/Debian systems:
 ```bash
 sudo apt-get install libmagic1
+```
+
+For macOS with Homebrew:
+```bash
+brew install libmagic
 ```
 
 ### Directory Structure
@@ -171,8 +183,10 @@ sudo apt-get install libmagic1
 - This script runs on port `5000` by default, but you can change it in the `app.run()` function.
 
 ### Error Handling
-- If the `file` key is not present in the request, the server will respond with `400 Bad Request` and an error message.
-- If a requested file does not exist, the server will respond with `404 Not Found`.
+- If neither `file` nor `file_url` is provided, the server will respond with `400 Bad Request`
+- If the file download from URL fails, the server will respond with `400 Bad Request`
+- If a requested file does not exist, the server will respond with `404 Not Found`
+- If file type is not supported for preview, the server will respond with `400 Bad Request`
 
 ### Security Considerations
 When running the server with public access, consider implementing:
