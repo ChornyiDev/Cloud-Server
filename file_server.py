@@ -81,12 +81,16 @@ def upload_file():
     download_url = f"{base_url}{url_for('download_file', filename=unique_filename)}"
     preview_url = f"{base_url}{url_for('preview_file', filename=unique_filename)}"
     
+    # Get file size in bytes
+    file_size = os.path.getsize(file_path)
+    
     return jsonify({
         'message': 'File uploaded successfully',
         'original_filename': filename,
         'stored_filename': unique_filename,
         'download_url': download_url,
-        'preview_url': preview_url
+        'preview_url': preview_url,
+        'file_size': file_size
     }), 200
 
 @app.route('/download/<filename>', methods=['GET'])
