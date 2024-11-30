@@ -107,8 +107,12 @@ def preview_file(filename):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         mime_type, _ = mimetypes.guess_type(filename)
         
-        # Перевіряємо, чи це відео або аудіо файл
-        if mime_type and (mime_type.startswith('video/') or mime_type.startswith('audio/')):
+        # Перевіряємо, чи це зображення, відео або аудіо файл
+        if mime_type and (
+            mime_type.startswith('video/') or 
+            mime_type.startswith('audio/') or 
+            mime_type.startswith('image/')
+        ):
             return send_file(
                 file_path,
                 mimetype=mime_type,
