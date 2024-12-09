@@ -9,7 +9,8 @@ from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
-BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = os.getenv('BASE_URL', 'https://storage.magicboxpremium.com')
+HOST_URL = os.getenv('HOST_URL', 'https://storage.magicboxpremium.com')
 
 app = Flask(__name__)
 
@@ -80,6 +81,7 @@ def upload_file():
     base_url = BASE_URL.rstrip('/')
     download_url = f"{base_url}{url_for('download_file', filename=unique_filename)}"
     preview_url = f"{base_url}{url_for('preview_file', filename=unique_filename)}"
+    host_url = f"{HOST_URL}/uploads/{unique_filename}"
     
     # Get file size in bytes
     file_size = os.path.getsize(file_path)
@@ -90,6 +92,7 @@ def upload_file():
         'stored_filename': unique_filename,
         'download_url': download_url,
         'preview_url': preview_url,
+        'host_url': host_url,
         'file_size': file_size
     }), 200
 
