@@ -3,3 +3,7 @@ python-dotenv==1.0.1
 gunicorn==21.2.0
 python-magic==0.4.27
 requests==2.31.0
+Werkzeug==3.0.1
+urllib3==2.2.1
+python-magic-bin==0.4.14; platform_system == "Windows"
+mimetypes==0.1.0

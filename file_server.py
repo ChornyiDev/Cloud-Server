@@ -6,6 +6,8 @@ import uuid
 import mimetypes
 import requests
 from urllib.parse import urlparse
+from logger_config import setup_logger
+import traceback
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +19,9 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+# Ініціалізація логера
+logger = setup_logger()
 
 def generate_unique_filename(original_filename):
     name, ext = os.path.splitext(original_filename)
@@ -50,69 +55,91 @@ def download_file_from_url(url):
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    file_url = request.form.get('file_url')
-    
-    if file_url:
-        # Try to download file from URL
-        content, filename = download_file_from_url(file_url)
-        if content is None:
-            return jsonify({'error': f'Failed to download file from URL: {filename}'}), 400
+    try:
+        file_url = request.form.get('file_url')
+        logger.info(f"Upload request received. URL: {file_url if file_url else 'Direct file upload'}")
         
-        unique_filename = generate_unique_filename(filename)
-        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-        
-        with open(file_path, 'wb') as f:
-            f.write(content)
-    else:
-        # Handle regular file upload
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-        
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
+        if file_url:
+            # Try to download file from URL
+            content, filename = download_file_from_url(file_url)
+            if content is None:
+                error_msg = f'Failed to download file from URL: {filename}'
+                logger.error(error_msg)
+                return jsonify({'error': error_msg}), 400
+            
+            unique_filename = generate_unique_filename(filename)
+            file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+            
+            with open(file_path, 'wb') as f:
+                f.write(content)
+            logger.info(f"File downloaded and saved: {unique_filename}")
+        else:
+            # Handle regular file upload
+            if 'file' not in request.files:
+                logger.error("No file part in request")
+                return jsonify({'error': 'No file part'}), 400
+            
+            file = request.files['file']
+            if file.filename == '':
+                logger.error("No selected file")
+                return jsonify({'error': 'No selected file'}), 400
 
-        filename = file.filename
-        unique_filename = generate_unique_filename(filename)
-        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-        file.save(file_path)
-    
-    base_url = BASE_URL.rstrip('/')
-    download_url = f"{base_url}{url_for('download_file', filename=unique_filename)}"
-    preview_url = f"{base_url}{url_for('preview_file', filename=unique_filename)}"
-    
-    # Get file size in bytes
-    file_size = os.path.getsize(file_path)
-    
-    return jsonify({
-        'message': 'File uploaded successfully',
-        'original_filename': filename,
-        'stored_filename': unique_filename,
-        'download_url': download_url,
-        'preview_url': preview_url,
-        'file_size': file_size
-    }), 200
+            filename = file.filename
+            unique_filename = generate_unique_filename(filename)
+            file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+            file.save(file_path)
+            logger.info(f"File uploaded successfully: {unique_filename}")
+        
+        base_url = BASE_URL.rstrip('/')
+        download_url = f"{base_url}{url_for('download_file', filename=unique_filename)}"
+        preview_url = f"{base_url}{url_for('preview_file', filename=unique_filename)}"
+        
+        # Get file size in bytes
+        file_size = os.path.getsize(file_path)
+        
+        response_data = {
+            'message': 'File uploaded successfully',
+            'original_filename': filename,
+            'stored_filename': unique_filename,
+            'download_url': download_url,
+            'preview_url': preview_url,
+            'file_size': file_size
+        }
+        logger.info(f"Upload completed: {response_data}")
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        error_msg = f"Error during file upload: {str(e)}\n{traceback.format_exc()}"
+        logger.error(error_msg)
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
     try:
+        logger.info(f"Download request for file: {filename}")
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         return send_file(file_path, as_attachment=True)
     except FileNotFoundError:
+        logger.error(f"File not found: {filename}")
         return jsonify({'error': 'File not found'}), 404
+    except Exception as e:
+        error_msg = f"Error during file download: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/preview/<filename>', methods=['GET'])
 def preview_file(filename):
     try:
+        logger.info(f"Preview request for file: {filename}")
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         mime_type, _ = mimetypes.guess_type(filename)
         
-        # Перевіряємо, чи це зображення, відео або аудіо файл
         if mime_type and (
             mime_type.startswith('video/') or 
             mime_type.startswith('audio/') or 
             mime_type.startswith('image/')
         ):
+            logger.info(f"Serving preview for {filename} ({mime_type})")
             return send_file(
                 file_path,
                 mimetype=mime_type,
@@ -120,10 +147,16 @@ def preview_file(filename):
                 download_name=filename
             )
         else:
+            logger.warning(f"Unsupported file type for preview: {filename} ({mime_type})")
             return jsonify({'error': 'File type not supported for preview'}), 400
             
     except FileNotFoundError:
+        logger.error(f"File not found: {filename}")
         return jsonify({'error': 'File not found'}), 404
+    except Exception as e:
+        error_msg = f"Error during file preview: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5005) 
